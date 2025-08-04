@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinLearn</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f1f1;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      font-size: 3em;
+      color: #2b6777;
+    }
+    p {
+      font-size: 1.2em;
+      color: #555;
+      margin-bottom: 40px;
+    }
+    button {
+      background: #2b6777;
+      color: white;
+      padding: 15px 30px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      cursor: pointer;
+    }
+    #aboutText {
+      display: none;
+      margin-top: 30px;
+      color: #333;
+      font-size: 1.1em;
+    }
+    iframe {
+      display: none;
+      width: 100%;
+      height: 600px;
+      border: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>FinLearn</h1>
+  <p>by VittSathi</p>
+
+  <button onclick="startGame()">🎮 Play Game</button>
+  <button onclick="showAbout()">📖 About</button>
+  <button onclick="openYouTube()">📺 Visit YouTube</button>
+
+  <div id="aboutText">
+    <p>FinLearn is an educational game that helps you learn how to manage money wisely by choosing whether to spend or save. Created by VittSathi to promote financial literacy in a fun way.</p>
+  </div>
+
+  <iframe id="gameFrame" src=""></iframe>
+
+  <script>
+    function startGame() {
+      document.getElementById("aboutText").style.display = "none";
+      const gameFrame = document.getElementById("gameFrame");
+      gameFrame.src = "game.html"; // Replace with actual path to your game
+      gameFrame.style.display = "block";
+    }
+
+    function showAbout() {
+      document.getElementById("gameFrame").style.display = "none";
+      document.getElementById("aboutText").style.display = "block";
+    }
+
+    function openYouTube() {
+      window.open("https://www.youtube.com/@YourChannel", "_blank"); // Replace with actual channel
+    }
+  </script>
+</body>
+</html>
