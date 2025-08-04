@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spend or Save?</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #00aaff;
+      color: white;
+      text-align: center;
+    }
+    .container {
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    .card {
+      background-color: white;
+      color: black;
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 400px;
+      margin: 20px auto;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+    .decision-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .decision-buttons button {
+      padding: 15px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px;
+      min-width: 40%;
+    }
+    .btn-save {
+      background-color: #28a745;
+      color: white;
+    }
+    .btn-spend {
+      background-color: #dc3545;
+      color: white;
+    }
+    .status {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+      font-size: 1em;
+    }
+    .status div {
+      background: white;
+      color: black;
+      padding: 10px;
+      border-radius: 10px;
+      width: 30%;
+    }
+    img {
+      max-width: 100px;
+      margin: 10px 0;
+    }
+    #summaryScreen {
+      display: none;
+    }
+    .score-box {
+      background-color: white;
+      color: black;
+      max-width: 400px;
+      margin: 30px auto;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Game Container -->
+<div class="container" id="gameScreen">
+  <h1>Save or Spend?</h1>
+  <div class="card" id="gameCard">
+    <img id="scenarioIcon" src="" alt="Scenario Icon" />
+    <p id="scenarioText"></p>
+    <div class="decision-buttons">
+      <button class="btn-save" onclick="chooseOption('save')">Save</button>
+      <button class="btn-spend" onclick="chooseOption('spend')">Spend</button>
+    </div>
+  </div>
+
+  <div class="status">
+    <div><strong>Wallet</strong><br>₹<span id="wallet">0</span></div>
+    <div><strong>Vitt Score</strong><br><span id="vittScore">50</span></div>
+    <div><strong>Financial Health</strong><br><span id="health">Fair</span></div>
+  </div>
+</div>
+
+<!-- Summary Screen -->
+<div class="container" id="summaryScreen">
+  <h1>🎉 Game Completed!</h1>
+  <div class="score-box">
+    <p><strong>Final Wallet:</strong> ₹<span id="finalWallet"></span></p>
+    <p><strong>Vitt Score:</strong> <span id="finalVitt"></span></p>
+    <p><strong>Financial Health:</strong> <span id="finalHealth"></span></p>
+  </div>
+</div>
+
+<!-- Sounds -->
+<audio id="tickSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3" preload="auto"></audio>
+<audio id="crossSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3" preload="auto"></audio>
+
+<script>
+  let wallet = 0;
+  let vittScore = 50;
+  let currentIndex = 0;
+
+  const tickSound = document.getElementById("tickSound");
+  const crossSound = document.getElementById("crossSound");
+
+  const scenarios = [
+    {
+      text: "You earned ₹1000 today.",
+      saveText: "Save ₹300 into SIP",
+      spendText: "Buy headphones ₹800",
+      icon: "https://cdn-icons-png.flaticon.com/512/833/833472.png",
+      saveImpact: +5,
+      spendImpact: -10
+    },
+    {
+      text: "You are offered a credit card.",
+      saveText: "Decline & learn more",
+      spendText: "Accept instantly",
+      icon: "https://cdn-icons-png.flaticon.com/512/2645/2645897.png",
+      saveImpact: +10,
+      spendImpact: -15
+    },
+    {
+      text: "You received ₹500 as a reward.",
+      saveText: "Invest ₹200 in mutual fund",
+      spendText: "Buy pizza for ₹400",
+      icon: "https://cdn-icons-png.flaticon.com/512/3595/3595455.png",
+      saveImpact: +5,
+      spendImpact: -5
+    },
+    {
+      text: "Weekend plan! 🎬",
+      saveText: "Invest ₹300 instead",
+      spendText: "Go for a movie ₹300",
+      icon: "https://cdn-icons-png.flaticon.com/512/3103/3103482.png",
+      saveImpact: +7,
+      spendImpact: -6
+    },
+    {
+      text: "New gym membership 🏋️",
+      saveText: "Invest ₹500 instead",
+      spendText: "Pay ₹500 for gym",
+      icon: "https://cdn-icons-png.flaticon.com/512/2331/2331966.png",
+      saveImpact: +6,
+      spendImpact: -4
+    },
+    {
+      text: "Flash sale today!",
+      saveText: "Skip shopping",
+      spendText: "Buy clothes ₹1200",
+      icon: "https://cdn-icons-png.flaticon.com/512/1064/1064961.png",
+      saveImpact: +8,
+      spendImpact: -12
+    },
+    {
+      text: "You got ₹2000 bonus!",
+      saveText: "Add ₹1500 to savings",
+      spendText: "Buy a smart speaker ₹1800",
+      icon: "https://cdn-icons-png.flaticon.com/512/1040/1040230.png",
+      saveImpact: +12,
+      spendImpact: -8
+    },
+    {
+      text: "You found ₹100!",
+      saveText: "Put it in piggy bank",
+      spendText: "Get a milkshake ₹100",
+      icon: "https://cdn-icons-png.flaticon.com/512/1526/1526866.png",
+      saveImpact: +3,
+      spendImpact: -2
+    },
+    {
+      text: "Car needs service",
+      saveText: "Service next month",
+      spendText: "Service now ₹1000",
+      icon: "https://cdn-icons-png.flaticon.com/512/2961/2961983.png",
+      saveImpact: +2,
+      spendImpact: -5
+    },
+    {
+      text: "You got a freelance payment ₹800",
+      saveText: "Save ₹500",
+      spendText: "Party with friends ₹800",
+      icon: "https://cdn-icons-png.flaticon.com/512/857/857429.png",
+      saveImpact: +6,
+      spendImpact: -7
+    }
+  ];
+
+  function updateUI() {
+    if (currentIndex >= scenarios.length) {
+      showSummary();
+      return;
+    }
+
+    const scenario = scenarios[currentIndex];
+    document.getElementById("scenarioText").innerText = scenario.text;
+    document.getElementById("scenarioIcon").src = scenario.icon;
+    document.querySelector(".btn-save").innerText = scenario.saveText;
+    document.querySelector(".btn-spend").innerText = scenario.spendText;
+    document.getElementById("wallet").innerText = wallet;
+    document.getElementById("vittScore").innerText = vittScore;
+    document.getElementById("health").innerText = getHealthStatus(vittScore);
+  }
+
+  function chooseOption(choice) {
+    const scenario = scenarios[currentIndex];
+
+    if (choice === 'save') {
+      wallet += 300;
+      vittScore += scenario.saveImpact;
+      tickSound.play();
+    } else {
+      wallet -= 300;
+      vittScore += scenario.spendImpact;
+      crossSound.play();
+    }
+
+    currentIndex++;
+    updateUI();
+  }
+
+  function getHealthStatus(score) {
+    if (score >= 80) return "Excellent";
+    if (score >= 60) return "Good";
+    if (score >= 40) return "Fair";
+    return "Poor";
+  }
+
+  function showSummary() {
+    document.getElementById("gameScreen").style.display = "none";
+    document.getElementById("summaryScreen").style.display = "block";
+    document.getElementById("finalWallet").innerText = wallet;
+    document.getElementById("finalVitt").innerText = vittScore;
+    document.getElementById("finalHealth").innerText = getHealthStatus(vittScore);
+  }
+
+  updateUI();
+</script>
+
+</body>
+</html>
